@@ -8,7 +8,7 @@ variable "account_tier"{
     type = string
 }
 
-variable "account_replication"{
+variable "account_replication_type"{
     description = "Account replication like LRS, GRS, GZRS etc"
     type = string
 }
