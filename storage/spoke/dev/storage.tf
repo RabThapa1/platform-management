@@ -1,9 +1,12 @@
 module "storage_account_1" {
   source                   = "../../module"
-  name                     = local.name
-  account_tier             = local.account_tier
-  resource_group_name      = local.resource_group_name
-  location                 = local.location
-  account_replication_type = local.account_replication_type
+  name                     = "st_account"
+  account_tier             = "Standard"
+  account_replication_type = "GRS"
 
+  environment = [{
+    environment         = "d"
+    resource_group_name = "rg_d_st_account"
+    location            = "australiaeast"
+  }]
 }
