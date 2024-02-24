@@ -1,6 +1,6 @@
 module "storage_account_1" {
   source                   = "../../module"
-  name                     = "st_account"
+  name                     = "staccount"
   account_tier             = "Standard"
   account_replication_type = "GRS"
 
