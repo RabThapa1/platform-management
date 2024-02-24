@@ -12,13 +12,3 @@ variable "account_replication_type"{
     description = "Account replication like LRS, GRS, GZRS etc"
     type = string
 }
-
-variable "resource_group_name"{
-    description = "Name of the resource group"
-    type = string
-}
-
-variable "location"{
-    description = "location"
-    type = string
-}
