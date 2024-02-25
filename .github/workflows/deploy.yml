@@ -1,37 +1,78 @@
-name : "Terraform plan and deploy"
+name: Terraform Plan & Apply
 
-on: 
- 
- pull_request:
-  branches: 
-    -main
-    -develop
+# Define the events that trigger the workflow
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+  push:
+    branches:
+      - main
+      - develop
 
- push:
-  branches:
-   -main
-   -develop
- 
- jobs:
-  terraform: 
-   name: Terraform Plan
-   runs-on: ubuntu-latest
+# Define the jobs to be executed
+jobs:
+  terraform:
+    name: Terraform Plan
+    runs-on: ubuntu-latest
+    
+    steps:
+      # Step 1: Checkout the repository code
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-   steps:
+      # Step 2: Setup Terraform
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: <terraform_version> # specify desired Terraform version
 
-   -name: checkout code
-    uses: actions/checkout@v2
+      # Step 3: Initialize Terraform
+      - name: Terraform Init
+        run: terraform init
 
-  -name: setup Terraform
-   uses: hashicorp/setup-terraform@v1
+      # Step 4: Run Terraform Plan
+      - name: Terraform Plan
+        run: terraform plan -out=tfplan
 
-  -name: Terraform init
-   run: terraform init
+      # Step 5: Save plan artifact
+      - name: Save plan artifact
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: tf-plan
+          path: tfplan
 
-  -name: Terracorm plan
-   run: terraform plan
-   env:
-      TF_INPUT: "false"
-      ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-      ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-      ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }} 
+  apply:
+    name: Terraform Apply
+    needs: terraform
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
+    
+    steps:
+      # Step 1: Checkout the repository code
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Step 2: Download the plan artifact
+      - name: Download plan artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: tf-plan
+          path: .
+
+      # Step 3: Setup Terraform
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: <terraform_version> # specify desired Terraform version
+
+      # Step 4: Apply Terraform Changes
+      - name: Terraform Apply
+        run: terraform apply tfplan
+        env:
+           TF_INPUT: "false"
+           ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+           ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+           ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }} 
