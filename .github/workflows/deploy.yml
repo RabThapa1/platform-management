@@ -26,7 +26,9 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
         with:
-          terraform_version: <terraform_version> # specify desired Terraform version
+           ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+           ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+           ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }} 
 
       # Step 3: Initialize Terraform
       - name: Terraform Init
